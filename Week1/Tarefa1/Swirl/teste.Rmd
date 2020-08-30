@@ -1,0 +1,48 @@
+---
+title: "Tarefa 6 - Subsettting Vectors"
+output:
+  html_document:
+    df_print: paged
+---
+
+Nesta lição, veremos como extrair elementos de um vetor com base em algumas condições que especificamos.
+
+Por exemplo, podemos estar interessados apenas nos primeiros 20 elementos de um vetor, ou apenas os elementos que não são NA, ou apenas aqueles que são positivos ou correspondem a uma variável específica de interesse. Ao final desta lição, você saberá como lidar com cada um desses cenários.
+
+Criei para você um vetor chamado x que contém uma ordem aleatória de 20 números (de uma distribuição normal padrão) e 20 NAs. Digite x agora para ver como fica.
+
+
+
+
+```{r}
+x 
+
+```
+
+RETORNARIA ESTE CONJUNTO DE VALORES :
+
+x
+ [1]         NA         NA         NA -0.8453900         NA         NA
+ [7]         NA -0.5213741         NA  1.0086354         NA  0.6383823
+[13] -0.4651458         NA         NA         NA -0.1210694  0.9310944
+[19] -0.3280570 -0.3034631 -0.6419983 -0.6775012  1.3141183         NA
+[25]         NA  1.3798199         NA  1.3665371         NA -0.4231386
+[31]         NA         NA         NA         NA -1.3564646 -0.7911997
+[37]         NA -0.2435252 -0.2796992 -0.9872303
+
+
+
+A maneira de dizer a R que deseja selecionar alguns elementos particulares (ou seja, um 'subconjunto') de um vetor é colocando um 'vetor de índice' entre colchetes imediatamente após o nome do vetor.
+
+Para um exemplo simples, experimente x [1:10] para ver os primeiros dez elementos de | x.
+
+```{r}
+X[1:10]
+
+```
+
+ x[1:10]
+ [1]         NA         NA         NA -0.8453900         NA         NA
+ [7]         NA -0.5213741         NA  1.0086354
+ 
+ 

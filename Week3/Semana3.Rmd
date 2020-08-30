@@ -1,0 +1,417 @@
+---
+title: 'Semana 3 '
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  word_document: default
+  pdf_document: default
+---
+
+#Looping na linha de comando Looping na linha de comando
+
+Escrever para loops while é útil durante a programação, mas não é particularmente fácil ao trabalhar interativamente na linha de comando. Existem algumas funções que implementam o loop para tornar a vida mais fácil
+
+* lapply: Loop sobre uma lista e avaliar uma função em cada elemento
+* sapply: o mesmo que lapply, mas tente simplificar o resultado
+* apply: aplica uma função nas margens de uma matriz
+* tapply: Aplicar uma função em subconjuntos de um vetor
+* mapply: versão multivariada de lapply
+
+Uma divisão de função split também é útil, particularmente em conjunto com lapply.
+
+
+# lapply
+
+Uma divisão de função auxiliar também é útil, particularmente em conjunto com lapply.
+
+
+
+
+```{r}
+
+lapply
+
+```
+* X é uma lista
+* FUN: é uma função ou nome de uma função 
+* ... : outros argumentos que podem ser passados com as reticências, os argumentos da função que será aplicada
+* se X não for uma lista será forçado a se tornar uma ou então teremos um erro
+* as.list(x) força a transformação em lista
+
+The actual looping is done internally in C code.
+
+lapply sempre retorna uma lista, independentemente da classe da entrada.
+
+```{r}
+x <- list(a = 1:5, b = rnorm(10))
+lapply(x, mean)
+
+```
+
+A idéia de lapply é aplicar a função a cada um dos elementos dessa lista criada
+
+lapply sempre retornará uma lista
+
+
+
+Outro exemplo de lapply um pouco mais complicado
+
+```{r}
+x <- list(a = 1:4, b = rnorm(10), c = rnorm(20, 1), d = rnorm(100, 5))
+lapply(x, mean)
+```
+Outra forma de chamar lapply
+
+```{r}
+x <- 1:4 # uma lista de 1 a 4
+lapply(x, runif) #runif gera variáveis aleatórias de distribuição uniforme
+
+```
+* runif 1 : gera uma variavel aleatória
+* runif 2 : gera 2 variaveis aleatórias
+* runif 3 : gera 3
+* runif 4 : gera 4
+* runif 1:4 : gera para cada numero da lista
+
+Suponha que queremos criar variaveis aleatórias como no exemplo anterior mas que não fiquem somente entre 0 e 1 como no exemplo anterior:
+```{r}
+x <- 1:4
+lapply(x, runif, min = 0, max = 10)
+```
+define-se os valores minimos e máximos das variáveis aleatórias
+
+
+
+
+lapply faz uso das chamadas funções anônimas, aquelas que não tem nomes, mas que pode criar a medida que precisa
+
+```{r}
+x <- list(a = matrix(1:4, 2, 2), b = matrix(1:6, 3, 2))
+x
+```
+Suponha que eu queira extrair os dados das primeiras colunas, então eu aplico a seguinte função mesmo não existindo uma função pré criada para isso
+```{r}
+lapply(x, function(elt) elt[,1])
+
+```
+Essa função só existe dentro do conceito de lapply, depois que a execução termina essa fnunção some, por isso é anônima, não tem um nome para ela.
+
+
+
+# sapply
+
+sapply tentará simplificar o resultado de lapply se possível.
+
+- Se o resultado for uma lista onde cada elemento tem comprimento 1, então um vetor é retornado
+- Se o resultado for uma lista em que cada elemento é um vetor do mesmo comprimento (> 1), uma matriz é retornada.
+- Se não conseguir descobrir as coisas, uma lista é retornada
+
+```{r}
+x <- list(a = 1:4, b = rnorm(10), c = rnorm(20, 1), d = rnorm(100, 5))
+lapply(x, mean)
+```
+Perceba o usa de sapply aqui, ele transforma a lista em um vetor, facilitando a visualização.
+
+```{r}
+sapply(x, mean) 
+```
+
+Perceba aqui que sem a função anonima ela não funciona e retorna uma mensagem de advertência
+```{r}
+mean(x)
+```
+
+
+
+# apply
+
+
+apply é usado para avaliar uma função (geralmente anônima) nas margens de um array.
+
+* É mais frequentemente usado para aplicar uma função às linhas ou colunas de uma matriz
+* Pode ser usado com matrizes gerais, por exemplo, tomando a média de uma matriz de matrizes
+* Não é realmente mais rápido do que escrever um loop, mas funciona em uma linha!
+
+```{r}
+str(apply)
+function (X, MARGIN, FUN, ...)
+```
+* X é um array
+* MARGIN é um vetor inteiro que indica quais margens devem ser “retidas”.
+* FUN é uma função a ser aplicada(ex: mean ou sum)
+* ... é para outros argumentos serem passados para a FUN
+
+```{r}
+x <- matrix(rnorm(200), 20, 10) # Cria a matriz com 20 linhas e 10 cols
+
+#aqui vamos usar apply
+# o número 2 refere-se a segunda dimensão criada 10 colunas
+apply(x, 2, mean)
+
+```
+
+```{r}
+# aqui 1 refere-se a primeira dimensao criada 20 linhas
+apply(x, 1, sum)
+
+```
+
+### col/row sums and means
+
+Para somas e médias das dimensões da matriz, temos alguns atalhos
+
+* rowSums = aplicar (x, 1, sum)
+* rowMeans = apply (x, 1, mean)
+* colSums = aplicar (x, 2, sum)
+* colMeans = apply (x, 2, mean)
+
+###  Outras maneiras de se inscrever
+
+Quartis das linhas de uma matriz.
+
+```{r}
+x <- matrix(rnorm(200), 20, 10)
+apply(x, 1, quantile, probs = c(0.25, 0.75))
+```
+
+### Matriz média em uma matriz
+
+```{r}
+# Aqui temos a criação de uma matriz com variaveis aleatórias normais
+# com 2 linhas * 2 colunas * 10 ouseja tenho 10 matrizes 2*2
+a <- array(rnorm(2 * 2 * 10), c(2, 2, 10))
+apply(a, c(1, 2), mean)
+
+
+```
+
+Aqui temos outra forma de fazer a mesma coisa feita anteriormente
+
+```{r}
+rowMeans(a, dims = 2)
+```
+
+
+# mapply
+
+
+mapply é um tipo de aplicação multivariada que aplica uma função em paralelo sobre um conjunto de argumentos
+
+Ouseja, vai aplicar a função a multiplas listas de argumentos
+
+
+```{r}
+
+str(mapply)
+```
+
+* FUN é uma função a ser aplicada
+* ... contém argumentos para aplicar
+* MoreArgs é uma lista de outros argumentos para FUN.
+* SIMPLIFICAR indica se o resultado deve ser simplificado
+
+
+O seguinte é tedioso de digitar
+
+list (rep (1, 4), rep (2, 3), rep (3, 2), rep (4, 1))
+
+Em vez disso, podemos fazer
+
+```{r}
+mapply(rep, 1:4, 4:1)
+
+```
+
+### Vectorizubg a Function
+
+Definindo a função
+
+```{r}
+noise <- function(n, mean, sd) {
+ rnorm(n, mean, sd)
+ }
+```
+
+```{r}
+noise(5, 1, 2)
+```
+```{r}
+noise(1:5, 1:5, 2)
+```
+Quando passo esses argumentos tenho esses resultado, mas não era o que eu queria
+
+Portanto precisamos passar o seguinte comando
+
+```{r}
+mapply(noise, 1:5, 1:5, 2)
+```
+Isso é o mesmo que fazer isto,
+```{r}
+list(noise(1, 1, 2), noise(2, 2, 2),
+ noise(3, 3, 2), noise(4, 4, 2),
+ noise(5, 5, 2))
+```
+
+
+
+
+# tapply
+
+tapply é usado para aplicar uma função em subconjuntos de um vetor. Eu não sei por que é chamado de tapply
+
+```{r}
+str(tapply)
+
+```
+
+* X é um vetor
+* INDEX é um fator ou uma lista de fatores (ou então eles são coagidos a fatores)
+* FUN é uma função a ser aplicada
+* ... contém outros argumentos a serem passados FUN
+* simplify, devemos simplificar o resultado?
+
+
+```{r}
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+f <- gl(3, 10)
+f
+
+```
+
+Aqui você percebera que tera 10x1, 10x2, 10x3
+
+```{r}
+tapply(x, f, mean)
+
+```
+Se voce não simplificar os resutlados terá uma lista
+
+
+```{r}
+
+tapply(x, f, mean, simplify = FALSE)
+
+```
+
+Encontre intervalos de grupo
+
+```{r}
+tapply(x, f, range)
+
+```
+
+Isso me dá os mínimos e máximos dentro daquele grupo
+
+
+
+# split
+
+
+Split (divisão) pega um vetor ou outros objetos e os divide em grupos determinados por um fator ou lista de fatores
+
+É parecido com tapply, mas sem resumos estatitísticos 
+
+
+```{r}
+str(split)
+```
+
+* x é um vetor (ou lista) ou quadro de dados
+* f é um fator (ou coagido a um) ou uma lista de fatores, se f tiver 3 grupos então a função dividirá x em tres grupos
+* então quando tiver esse grupos divididos poderá aplicar apply, lapply ou sapply naqueles pequenos grupos individuais
+* drop indica se os níveis de fatores vazios devem ser descartados
+
+
+```{r}
+
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+f <- gl(3, 10)
+split(x, f)
+
+
+```
+
+
+Usando a função lapply juntamente co a função split, a idéia é que divida algo e depois use a função lapply, no caso a função a seguir poderia ser substituída por tapply que neste caso faria a mesma coisa
+
+
+
+```{r}
+lapply(split(x, f), mean)
+
+```
+
+Aqui vamos importar um dataset e trabalhar sobre ele
+
+```{r}
+library(datasets)
+head(airquality)
+```
+
+Aqui estou fazendo um split dos dados da tabela importada separada por mês;
+
+```{r}
+s <- split(airquality, airquality$Month)
+lapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")]))
+
+
+```
+
+Aqui uma representação do uso de sapply no conjunto de dados S
+Veja que temos uma Matriz criada com varios valores nulos
+Os valores nulos seram removidos no próximo código
+
+```{r}
+sapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")]))
+```
+Aqui adicionamos na.rm para remover os NAs da matriz
+
+```{r}
+sapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")],
+ na.rm = TRUE))
+```
+
+Agora veremos a aplicação de split em mais de um nível
+Nos exemplos anteriores tivemos apenas uma variável  de fator, mas voce pode ter mais de uma variável de fator
+Por exemplo podemos ter 2 variáveis de fatores como genero(masculino e feminino) e raça (negro, branco, indio, muçulmano, asiático)
+
+f1 seria por exemplo masculino ou feminino
+f2 seria por exemplo raça( com 5 niveis distintos)
+
+```{r}
+x <- rnorm(10)
+f1 <- gl(2, 5) # 2 representa os niveis, 5 a quantidade de cada nivel
+f2 <- gl(5, 2)
+f1
+```
+```{r}
+f2
+```
+Aqui vou avaliar as combinações entre estes dois niveis, do primeiro fator com todos os outros niveis do segundo fator
+
+```{r}
+ interaction(f1, f2)
+```
+
+Agora posso dividir meu vetor numerico x de acordo com dois níveis diferentes
+
+
+
+As interações podem criar um nível vazio
+
+```{r}
+str(split(x, list(f1, f2)))
+```
+
+Com o comando a seguir vamos descartar os niveis vazios criados
+
+```{r}
+
+ str(split(x, list(f1, f2), drop = TRUE))
+
+```
+
+
+
+

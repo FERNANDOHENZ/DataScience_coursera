@@ -1,0 +1,153 @@
+---
+title: "Debugging"
+output: html_notebook
+---
+
+# Debugging
+
+Ferramenta de depuração integradas ao R
+Podem ser uteis para descobrir o que tem de errado se você encontrar um problema
+
+Indicações de que algo não está certo
+
+* message: Uma notificação genérica / mensagem de diagnóstico produzida pela função de mensagem; a execução da função continua
+* warning: uma indicação de que algo está errado, mas não necessariamente fatal; execução da função continua; gerado pela função de aviso
+error: uma indicação de que ocorreu um problema fatal; a execução pára; produzido pela parada da função
+condition: Um conceito genérico para indicar que algo inesperado pode ocorrer; programadores podem criar suas próprias condições
+
+
+
+### Warning
+
+```{r}
+log(-1)
+```
+Warning message:
+In log(-1) : NaNs produzidos
+
+
+Agora vamos ver uma pequena função criada, basicamente para dizer se x é maior que zero
+
+```{r}
+printmessage <- function(x) {
+ if(x > 0)
+ print("x is greater than zero")
+ else
+ print("x is less than or equal to zero")
+ invisible(x)
+}
+```
+
+A função inisible(x) faz com que os numeros não sejam impressos automaticamente
+
+```{r}
+printmessage(1)
+```
+
+```{r}
+printmessage(NA)
+```
+
+Aqui termina em erro porque a função não sabe o que fazer por isso retorna erro
+
+Então vamos corrigir o problema de outra forma
+
+```{r}
+printmessage2 <- function(x) {
+ if(is.na(x))
+ print("x is a missing value!")
+ else if(x > 0)
+ print("x is greater than zero")
+ else
+ print("x is less than or equal to zero")
+ invisible(x)
+}
+
+```
+
+```{r}
+printmessage2(NA)
+```
+
+
+```{r}
+printmessage2(log(-1))
+```
+isso produz um alerta
+[1] "x is a missing value!"
+Warning message:
+In log(-1) : NaNs produzidos
+
+
+### Como você sabe que algo está errado com sua função?
+* Qual foi a sua opinião? Como você chamou a função?
+* O que você esperava? Saída, mensagens, outros resultados?
+* O que você conseguiu?
+* Como o que você recebe difere do que você esperava?
+* Suas expectativas estavam corretas em primeiro lugar?
+* Você pode reproduzir o problema (exatamente)?
+
+
+
+# Debuggin Tools - Basic Tools
+
+
+As principais ferramentas para funções de depuração em R são
+
+* traceback: imprime a pilha de chamadas de função após a ocorrência de um erro; não faz nada se não houver erro 
+* debug: sinaliza uma função para o modo “debug” que permite que você avance pela execução de uma função uma linha de cada vez
+* browser: suspende a execução de uma função onde quer que seja chamada e coloca a função em modo de depuração
+* trace: permite que você insira o código de depuração em uma função em locais específicos
+* recover: permite que você modifique o comportamento do erro para que você possa navegar na pilha de chamadas de função
+
+
+
+
+# Debugging Tools _ using the tools
+
+
+
+## Traceback
+
+```{r}
+mean(z)
+
+```
+```{r}
+traceback()
+```
+
+A função traceback diz aonde o erro ocorreu neste caso no começo da função
+
+
+```{r}
+lm(y ~ z)
+
+```
+
+```{r}
+traceback()
+```
+
+
+## debug
+
+```{r}
+debug(lm)
+lm(y ~ x)
+```
+Aperto 'n' de next para continuar, e ele roda a primeira linha e vai rodando linha por linhas até dar o erro
+
+```{r}
+debug: m <- match(c("formula", "data", "subset", "weights", "na.action",
+ "offset"), names(mf), 0L)
+```
+
+
+## recover
+
+```{r}
+options(error = recover)
+read.csv('nosuchfile')
+
+```
